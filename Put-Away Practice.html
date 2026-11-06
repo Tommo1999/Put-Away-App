@@ -1,0 +1,817 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Put-Away Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column like a handheld screen. Tabs on top; drills show a dark scanner panel above a "scene" (tote or a face of shelving). Racking orange is the single accent. */
+:root{
+  --paper:#EDF0EB;--card:#FAFBF8;--ink:#17231F;--muted:#55655E;--line:#CFD8D1;
+  --accent:#C2410C;--accent-ink:#FFFFFF;
+  --good:#17693F;--good-bg:#DCF0E3;--bad:#A8200F;--bad-bg:#FBE3DE;
+  --dev:#14211D;--dev-ink:#E9F4EE;--dev-dim:#93AA9E;--dev-line:#2B3D36;--dev-hi:#8FE6B4;
+  --label:#FFFFFF;--label-ink:#111111;
+  --f-display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1512;--card:#17211C;--ink:#E7F0EA;--muted:#9DB1A6;--line:#2B3B33;
+    --accent:#F2763F;--accent-ink:#1A0C05;
+    --good:#6FD79C;--good-bg:#173626;--bad:#FF9482;--bad-bg:#3C1A15;
+    --dev:#0A100E;--dev-ink:#E9F4EE;--dev-dim:#8BA297;--dev-line:#2B3D36;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1512;--card:#17211C;--ink:#E7F0EA;--muted:#9DB1A6;--line:#2B3B33;
+  --accent:#F2763F;--accent-ink:#1A0C05;
+  --good:#6FD79C;--good-bg:#173626;--bad:#FF9482;--bad-bg:#3C1A15;
+  --dev:#0A100E;--dev-ink:#E9F4EE;--dev-dim:#8BA297;--dev-line:#2B3D36;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--paper);color:var(--ink);font:400 15px/1.5 var(--f-body);
+  padding-block:16px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.small{font-size:13px;color:var(--muted)}
+h1,h2,h3{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.04em;margin:0;text-wrap:balance}
+h1{font-size:32px;line-height:1;font-weight:700}
+h2{font-size:28px;line-height:1.05;font-weight:700;margin-bottom:6px}
+h3{font-size:21px;line-height:1.1;font-weight:600}
+p{margin:0}
+.sub{font:500 12px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.lede{max-width:62ch;color:var(--muted);margin-bottom:14px}
+
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);margin:14px 0 20px}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:10px 2px;min-height:44px;font-weight:600;color:var(--muted)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:11px 20px;min-height:44px;font-weight:600;font-size:16px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.link{background:none;border:0;padding:2px 0;color:var(--accent);text-decoration:underline;font-size:13px}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:6px;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.last{margin-bottom:6px}
+.drill{border-top:1px solid var(--line);padding:18px 0;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.drill p{max-width:60ch}
+.note{border-top:1px solid var(--line);padding-top:14px;margin-top:4px;max-width:62ch}
+.msg{margin-top:12px;padding:10px 12px;border-radius:6px;font-weight:500}
+.msg.ok{background:var(--good-bg);color:var(--good)}
+.msg.bad{background:var(--bad-bg);color:var(--bad)}
+
+/* scanner panel */
+.dev{background:var(--dev);color:var(--dev-ink);border-radius:14px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.dev-top{display:flex;justify-content:space-between;font:500 12px var(--f-mono);letter-spacing:.16em;color:var(--dev-dim)}
+.dev-name{font:600 22px/1.2 var(--f-display);letter-spacing:.02em;text-transform:uppercase}
+.dev-sub{color:var(--dev-dim);font-size:14px}
+.dev-dim{color:var(--dev-dim);font-size:13px;text-transform:uppercase;letter-spacing:.12em}
+.dev-loc{font-size:32px;font-weight:600;color:var(--dev-hi);line-height:1.1;letter-spacing:.02em}
+.dev-hint{border-top:1px solid var(--dev-line);padding-top:10px;font-weight:500}
+.tbar{height:4px;background:var(--dev-line);border-radius:2px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--dev-hi)}
+.scene-h{margin:20px 0 8px}
+.scene-h .small{text-transform:none;letter-spacing:0;font-family:var(--f-body);font-size:13px;font-weight:400}
+.quit{margin-top:22px}
+
+/* tote */
+.tote{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;gap:5px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;min-width:0}
+.tile:hover:not(:disabled){border-color:var(--accent)}
+.tile-name{font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.tile-pack{font-size:13px;color:var(--muted)}
+.tile-code{font-size:12px;color:var(--muted);letter-spacing:.08em}
+.bc{display:block;width:100%;height:34px;border-radius:2px}
+
+/* face of shelving */
+.face{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:8px}
+.slot{display:flex;flex-direction:column;gap:5px;text-align:left;background:var(--card);border:1px solid var(--line);border-bottom:5px solid var(--accent);border-radius:3px 3px 0 0;padding:7px 6px;min-width:0}
+.slot:hover:not(:disabled){border-color:var(--accent)}
+.slot-code{font-weight:600;font-size:12px;letter-spacing:0;white-space:nowrap}
+.slot .bc{height:22px}
+.slot-has{font-size:12px;color:var(--muted);line-height:1.3;overflow-wrap:anywhere}
+
+/* label check */
+.stat-line{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted);margin-bottom:10px}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.panel h3{font-size:15px;color:var(--muted);letter-spacing:.12em}
+.p-name{font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.p-code{font-size:26px;font-weight:600;letter-spacing:.1em}
+.p-code.loc{font-size:22px;letter-spacing:.03em;white-space:nowrap}
+mark{background:var(--bad-bg);color:var(--bad);font-weight:600;padding:0 1px;border-radius:2px}
+.answer-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.answer-row .btn{flex:1 1 140px}
+
+/* aisle recall */
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px}
+.q-name{font:600 22px/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt{display:flex;gap:10px;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-height:56px;font-size:22px;font-weight:600;letter-spacing:.08em}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+
+.opt.txt{font-size:15px;letter-spacing:0;text-align:center;line-height:1.25;font-family:var(--f-body)}
+.cat{display:flex;flex-direction:column;gap:6px}
+.cat-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+/* results */
+.score{font:700 64px/1 var(--f-display);margin:10px 0 4px}
+.score small{font-size:28px;color:var(--muted);font-weight:600}
+.slips{margin:14px 0 18px;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+
+/* catalogue */
+.search input,.f input,.f select{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-height:44px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.chips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;min-height:34px;font-size:13px}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row-main{min-width:0}
+.row-name{font-weight:500;overflow-wrap:anywhere}
+.row-loc{display:flex;flex-direction:column;align-items:flex-end;text-align:right;flex:none}
+.row-loc b{font-size:14px;white-space:nowrap}
+.tag{font-size:11px;border:1px solid var(--muted);color:var(--muted);padding:0 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em}
+details.add{margin-top:22px;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:0 14px}
+details.add summary{cursor:pointer;padding:12px 0;font-weight:600;min-height:44px}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;padding-bottom:14px}
+.f label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.f .full{grid-column:1/-1}
+.f .half{grid-column:span 2}
+
+/* aisles */
+.sec{border-top:1px solid var(--line);padding:18px 0;display:flex;flex-direction:column;gap:10px}
+.sec.first{border-top:0;padding-top:0}
+.anat{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.anat .slot{width:150px}
+.anat ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;max-width:46ch}
+.zone{display:flex;flex-direction:column;gap:6px}
+.zone-h{display:flex;gap:10px;align-items:baseline}
+.zone-h b{font-size:18px}
+.codes{display:flex;flex-wrap:wrap;gap:6px}
+.codes span{border:1px solid var(--line);background:var(--card);border-radius:4px;padding:2px 8px;font-size:13px}
+.tblwrap{overflow-x:auto;max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);font-size:13px;white-space:nowrap}
+.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;max-width:62ch}
+
+/* progress */
+.avgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.avgs div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--card)}
+.avgs b{display:block;font:700 30px/1.1 var(--f-display)}
+.chart{display:flex;gap:6px;align-items:flex-end;justify-content:flex-start;border-bottom:1px solid var(--line);padding-top:6px}
+.col{flex:0 1 40px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.col .v{font-size:11px;color:var(--muted)}
+.bw{height:120px;width:100%;display:flex;align-items:flex-end;position:relative}
+.bw::before{content:"";position:absolute;left:-3px;right:-3px;bottom:95%;border-top:1px dashed var(--muted);opacity:.6}
+.bar{display:block;width:100%;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px}
+.bar.hit{background:var(--good)}
+.col .k{font-size:11px;color:var(--muted);padding-bottom:4px}
+.missed{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--line)}
+.missed li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.confirm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Put-Away Practice</h1>
+    <div class="sub">Scan · Read · Shelve</div>
+    <nav class="tabs" aria-label="Sections">
+      <button data-action="tab" data-v="practice" aria-selected="true">Practice</button>
+      <button data-action="tab" data-v="catalogue" aria-selected="false">Catalogue</button>
+      <button data-action="tab" data-v="aisles" aria-selected="false">Aisles</button>
+      <button data-action="tab" data-v="progress" aria-selected="false">Progress</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+  <footer class="small">Unofficial practice tool, not connected to any retailer's systems. Products marked "example" are placeholders. Replace them with real items in Catalogue. Progress and your own items are saved on this device only.</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- data ---------- */
+var CATS=[
+  {k:'small',label:'Small items',short:'Small',aisles:['AAA','AAB','AAC','AAD','AAE']},
+  {k:'medium',label:'Medium items',short:'Medium',aisles:['BAC','BAD','BAE','BAF','BAG','BBA','BBB','BBC','BBD','BBE','BBF','BBG','BBH','BBI','BBJ','BBK','BBL']},
+  {k:'big',label:'Big items',short:'Big',aisles:['BBM','BBN','BBO']},
+  {k:'long',label:'Long items',short:'Long',aisles:['AAJ']},
+  {k:'tubes',label:'Plastic tubes and pipes',short:'Plastic pipes',aisles:['LAA','LAB']},
+  {k:'copper',label:'Copper pipes',short:'Copper pipes',aisles:['LAC']},
+  {k:'hazard',label:'Hazardous substances',short:'Hazardous',aisles:['HAB']}
+];
+var CATOF={},CATBY={},ALL=[];
+CATS.forEach(function(c){CATBY[c.k]=c;c.aisles.forEach(function(a){CATOF[a]=c;ALL.push(a);});});
+ALL.sort();
+var DEF={x:10,h:6,p:20};
+
+/* [code, name, pack, location]. Placeholders only, placed in the right type of aisle. */
+var EXAMPLES=[
+['214806','Countersunk Wood Screws 4.0 x 40mm',200,'AAA 03-02-05'],
+['214813','Countersunk Wood Screws 4.0 x 50mm',200,'AAA 03-02-06'],
+['214820','Countersunk Wood Screws 4.0 x 60mm',200,'AAA 03-02-07'],
+['305127','Plasterboard Screws 3.5 x 35mm',500,'AAA 03-03-05'],
+['305134','Plasterboard Screws 3.5 x 42mm',500,'AAA 03-03-06'],
+['118452','Nylon Wall Plugs 6mm',100,'AAB 04-01-02'],
+['118469','Nylon Wall Plugs 8mm',100,'AAB 04-01-03'],
+['560231','Zinc Hex Bolts M8 x 60mm',25,'AAB 02-04-11'],
+['560248','Zinc Hex Nuts M8',100,'AAB 02-04-12'],
+['672305','Push-Fit Straight Coupler 15mm',10,'AAC 05-02-08'],
+['672312','Push-Fit Straight Coupler 22mm',5,'AAC 05-02-09'],
+['672329','Push-Fit 90 Degree Elbow 15mm',10,'AAC 05-03-08'],
+['790516','Isolating Valve 15mm',2,'AAC 06-01-04'],
+['790523','Flexible Tap Connector 15mm x 300mm',2,'AAC 06-01-05'],
+['927650','13A Single Socket White',1,'AAD 07-02-10'],
+['927667','13A Double Socket White',1,'AAD 07-02-11'],
+['951203','LED GU10 Bulb 5W Warm White',5,'AAD 04-02-06'],
+['951210','LED GU10 Bulb 5W Cool White',5,'AAD 04-02-07'],
+['142917','SDS Plus Drill Bit 6 x 160mm',1,'AAE 02-01-08'],
+['142924','SDS Plus Drill Bit 8 x 160mm',1,'AAE 02-01-09'],
+['134889','Tape Measure 5m',1,'AAE 04-02-03'],
+['415720','Safety Glasses Clear',1,'AAE 02-03-09'],
+['415737','Disposable Dust Mask FFP2',10,'AAE 02-03-10'],
+['903408','Twin and Earth Cable 1.5mm x 25m',1,'BAC 01-04-03'],
+['903415','Twin and Earth Cable 2.5mm x 25m',1,'BAC 01-04-04'],
+['134872','Claw Hammer 16oz',1,'BBA 09-03-12'],
+['135540','Adjustable Spanner 250mm',1,'BBA 09-03-13'],
+['416900','Work Gloves Size 9 Large',1,'BBB 05-02-03'],
+['416893','Nitrile Gloves Large',100,'BBB 05-02-04'],
+['314286','Dust Sheet 3.6 x 2.7m',1,'BBC 03-01-06'],
+['207415','Decorators Caulk White 380ml',1,'BBC 04-02-14'],
+['207422','Silicone Sealant Clear 310ml',1,'BBC 04-02-15'],
+['136710','Spirit Level 1200mm',1,'AAJ 02-03-04'],
+['136727','Spirit Level 600mm',1,'AAJ 02-03-05'],
+['136734','Handsaw 550mm',1,'AAJ 04-02-08'],
+['144105','Tool Chest 26in',1,'BBM 03-02-04'],
+['144112','Folding Workbench',1,'BBN 02-01-06'],
+['145230','Stepladder 5 Tread',1,'BBO 01-01-02'],
+['145247','Stepladder 3 Tread',1,'BBO 01-01-03'],
+['612048','Waste Pipe 40mm x 3m White',1,'LAA 02-02-06'],
+['612055','Waste Pipe 32mm x 3m White',1,'LAA 02-02-07'],
+['612062','Overflow Pipe 21.5mm x 3m',1,'LAB 03-01-04'],
+['612079','Soil Pipe 110mm x 3m',1,'LAB 03-01-05'],
+['733140','Copper Tube 15mm x 3m',1,'LAC 01-02-05'],
+['733157','Copper Tube 22mm x 3m',1,'LAC 01-02-06'],
+['733164','Copper Tube 28mm x 3m',1,'LAC 02-02-05'],
+['208130','Expanding Foam Hand-Held 750ml',1,'HAB 05-02-03'],
+['881102','Solvent Weld Cement 250ml',1,'HAB 05-02-04'],
+['881119','Contact Adhesive 500ml',1,'HAB 05-03-03'],
+['881126','Paint Thinners 1L',1,'HAB 05-03-04']
+];
+var LEVELS={
+  easy:{label:'Easy',tote:2,show:true,rows:3,cols:3,limit:0,desc:'Two items in the tote. Nine shelf labels, each showing what is on it.'},
+  standard:{label:'Standard',tote:3,show:false,rows:4,cols:3,limit:0,desc:'Three items in the tote. Twelve shelf labels, no hints.'},
+  fast:{label:'Fast',tote:4,show:false,rows:5,cols:3,limit:20,desc:'Four items in the tote. Fifteen shelf labels. 20 seconds per item.'}
+};
+var KIND={putaway:'Put-away run',label:'Label check',aisle:'Aisle recall',type:'Aisle type'};
+var KCH={putaway:'P',label:'L',aisle:'A',type:'T'};
+var UNIT={putaway:'items put away clean first time',label:'cards right',aisle:'aisles right',type:'aisle types right'};
+
+/* ---------- storage ---------- */
+var KEY='put-away-practice-v2';
+var EXVER=3;
+var store={runs:[],missed:{},items:null,dims:{},exVer:0,noEx:false};
+try{
+  var s=JSON.parse(localStorage.getItem(KEY));
+  if(s&&typeof s==='object'){
+    store.runs=Array.isArray(s.runs)?s.runs:[];
+    store.missed=(s.missed&&typeof s.missed==='object')?s.missed:{};
+    store.items=Array.isArray(s.items)?s.items:null;
+    store.dims=(s.dims&&typeof s.dims==='object')?s.dims:{};
+    store.exVer=+s.exVer||0;store.noEx=!!s.noEx;
+  }
+}catch(e){}
+function exItems(){return EXAMPLES.map(function(a){return {code:a[0],name:a[1],pack:a[2],loc:a[3],example:true};});}
+if(!store.items){store.items=exItems();store.exVer=EXVER;}
+else if(store.exVer!==EXVER){
+  var own=store.items.filter(function(i){return !i.example;});
+  store.items=own.concat(store.noEx?[]:exItems().filter(function(e){return !own.some(function(o){return o.code===e.code||o.loc===e.loc;});}));
+  store.exVer=EXVER;
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function miss(code){store.missed[code]=(store.missed[code]||0)+1;save();}
+
+/* ---------- helpers ---------- */
+var view=document.getElementById('view');
+var state={tab:'practice',level:'standard',run:null,result:null,cat:'ALL',q:'',confirm:false,homeMsg:''};
+var timer=null;
+function stopTimer(){if(timer){clearInterval(timer);timer=null;}}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function packText(p){return +p===1?'Single':'Pack of '+p;}
+function pad2(n){return String(n).padStart(2,'0');}
+function fmtTime(s){var m=Math.floor(s/60),r=s%60;return m?m+' min '+r+' sec':r+' sec';}
+function fmt(a,x,h,p){return a+' '+pad2(x)+'-'+pad2(h)+'-'+pad2(p);}
+function parseLoc(s){return /^([A-Z]{3}) (\d{2})-(\d{2})-(\d{2})$/.exec(s);}
+function dimsOf(a){var o=store.dims[a]||{};return {x:o.x||DEF.x,h:o.h||DEF.h,p:o.p||DEF.p};}
+function mk(i){
+  var m=parseLoc(i.loc);if(!m||!CATOF[m[1]])return null;
+  return {code:i.code,name:i.name,pack:i.pack,loc:i.loc,aisle:m[1],cat:CATOF[m[1]].k,x:+m[2],h:+m[3],p:+m[4],example:!!i.example};
+}
+function items(){return store.items.map(mk).filter(Boolean);}
+function words(s){return s.toLowerCase().split(/[^a-z0-9.]+/).filter(Boolean);}
+function sim(a,b){
+  var wb=words(b.name),n=0;
+  words(a.name).forEach(function(w){if(wb.indexOf(w)>-1)n++;});
+  if(a.aisle===b.aisle){n+=2;if(a.x===b.x)n+=1;if(Math.abs(a.p-b.p)<=2)n+=2;}
+  return n+Math.random()*0.5;
+}
+function lookalikes(it,pool,n){
+  var ranked=pool.filter(function(x){return x.code!==it.code;}).map(function(x){return {x:x,s:sim(it,x)};}).sort(function(a,b){return b.s-a.s;}).slice(0,n+3).map(function(o){return o.x;});
+  return shuffle(ranked).slice(0,n);
+}
+function locDigits(loc){
+  var m=parseLoc(loc),L='ABCDEFGHIJKLMNOPQRSTUVWXYZ',d='';
+  for(var i=0;i<3;i++)d+=pad2(L.indexOf(m[1][i])+1);
+  return d+m[2]+m[3]+m[4];
+}
+function windowRange(v,max,n){
+  n=Math.min(n,max);
+  var s=Math.max(1,Math.min(v-Math.floor(n/2),max-n+1)),a=[];
+  for(var i=0;i<n;i++)a.push(s+i);
+  return a;
+}
+
+/* Code 39 barcode (digits only), black on a white label in both themes. */
+var C39={'0':'NNNWWNWNN','1':'WNNWNNNNW','2':'NNWWNNNNW','3':'WNWWNNNNN','4':'NNNWWNNNW','5':'WNNWWNNNN','6':'NNWWWNNNN','7':'NNNWNNWNW','8':'WNNWNNWNN','9':'NNWWNNWNN','*':'NWNNWNWNN'};
+function barcode(val,h){
+  var x=10,out='',str='*'+val+'*';
+  for(var k=0;k<str.length;k++){
+    var p=C39[str[k]];
+    for(var i=0;i<9;i++){
+      var w=p[i]==='W'?3:1;
+      if(i%2===0)out+='<rect x="'+x+'" y="0" width="'+w+'" height="'+h+'" fill="#111"/>';
+      x+=w;
+    }
+    x+=1;
+  }
+  var W=x+9;
+  return '<svg class="bc" viewBox="0 0 '+W+' '+h+'" preserveAspectRatio="none" role="img" aria-label="Barcode '+val+'"><rect width="'+W+'" height="'+h+'" fill="#fff"/>'+out+'</svg>';
+}
+
+/* ---------- views ---------- */
+function renderHome(){
+  var last=store.runs[store.runs.length-1],lv=state.level;
+  var lastTxt=last?'<p class="last small">Last run: <b>'+last.ok+'/'+last.total+'</b> '+KIND[last.kind]+(last.level&&LEVELS[last.level]?' · '+LEVELS[last.level].label:'')+'</p>':'';
+  var levelBtns=['easy','standard','fast'].map(function(k){return '<button data-action="level" data-v="'+k+'" aria-pressed="'+(lv===k)+'">'+LEVELS[k].label+'</button>';}).join('');
+  var warn=state.homeMsg?'<div class="msg bad" role="status">✕ '+esc(state.homeMsg)+'</div>':'';
+  return '<h2>Practice</h2>'+
+  '<p class="lede">Stock on the wrong shelf still shows as available on screen, then nobody can find it. These drills build the habit of scanning, reading and checking every time.</p>'+lastTxt+warn+
+  '<section class="drill"><h3>Put-away run</h3><p>Ten items. Scan the right item out of the tote, then scan the right shelf label on the aisle.</p>'+
+    '<div class="seg" role="group" aria-label="Level">'+levelBtns+'</div><p class="small">'+LEVELS[lv].desc+'</p>'+
+    '<button class="btn" data-action="start" data-v="putaway">Start run</button></section>'+
+  '<section class="drill"><h3>Label check</h3><p>Twenty cards. Does the shelf label match what the handheld says: same product code, same location? One wrong digit is all it takes.</p>'+
+    '<button class="btn" data-action="start" data-v="label">Start check</button></section>'+
+  '<section class="drill"><h3>Aisle recall</h3><p>Fifteen items. Which aisle does each one belong in? Pick from four codes. Any aisle of the right type counts.</p>'+
+    '<button class="btn" data-action="start" data-v="aisle">Start recall</button></section>'+
+  '<section class="drill"><h3>Aisle type</h3><p>Fifteen items. Is it small, medium, big, long, a plastic pipe, copper pipe or a hazardous substance? Know the type and you know which aisles to walk to.</p>'+
+    '<button class="btn" data-action="start" data-v="type">Start aisle type</button></section>'+
+  '<p class="note small">The products are examples in the real location format. Add your store\'s real items in Catalogue and set the aisle heights under Aisles, so the drills match the shop floor. Take Standard to a clean run before you try Fast.</p>';
+}
+
+function msgHtml(r){return r.msg?'<div class="msg '+r.msg.t+'" role="status">'+(r.msg.t==='ok'?'✓ ':'✕ ')+esc(r.msg.x)+'</div>':'';}
+
+function renderPutaway(r){
+  var L=LEVELS[r.level],it=r.items[r.i],main,hint,scene;
+  if(r.stage==='item'){
+    main='<div class="dev-name">'+esc(it.name)+'</div><div class="dev-sub mono">'+packText(it.pack)+' · '+it.code+'</div>';
+    hint='Scan this item from the tote.';
+    scene='<h3 class="scene-h">Tote</h3><div class="tote">'+r.tote.map(function(t){
+      return '<button class="tile" data-action="scanItem" data-code="'+t.code+'"'+(r.lock?' disabled':'')+'><span class="tile-name">'+esc(t.name)+'</span><span class="tile-pack">'+packText(t.pack)+'</span>'+barcode(t.code,34)+'<span class="tile-code mono">'+t.code+'</span></button>';
+    }).join('')+'</div>';
+  }else{
+    main='<div class="dev-dim">Put away to</div><div class="dev-loc mono">'+it.loc+'</div><div class="dev-sub">Aisle '+it.aisle+' · across '+pad2(it.x)+' · level '+pad2(it.h)+' · along '+pad2(it.p)+'</div><div class="dev-sub">'+esc(it.name)+'</div>';
+    hint='Scan the shelf label for this location.';
+    var d=dimsOf(it.aisle);
+    var hs=windowRange(it.h,Math.max(d.h,it.h),L.rows).reverse(),ps=windowRange(it.p,Math.max(d.p,it.p),L.cols);
+    var cells='';
+    hs.forEach(function(h){ps.forEach(function(p){
+      var loc=fmt(it.aisle,it.x,h,p),here=L.show?r.pool.filter(function(x){return x.loc===loc;}):[];
+      cells+='<button class="slot" data-action="scanLoc" data-loc="'+loc+'"'+(r.lock?' disabled':'')+'><span class="slot-code mono">'+loc+'</span>'+barcode(locDigits(loc),22)+(L.show?'<span class="slot-has">'+(here.length?esc(here[0].name):'Empty')+'</span>':'')+'</button>';
+    });});
+    scene='<h3 class="scene-h">Aisle '+it.aisle+', across '+pad2(it.x)+' <span class="small">· higher shelves at the top</span></h3><div class="face" style="--cols:'+ps.length+'">'+cells+'</div>';
+  }
+  var bar='';
+  if(r.limit){var pct=Math.max(0,(r.deadline-Date.now())/(r.limit*1000)*100);bar='<div class="tbar" aria-hidden="true"><i id="tbar" style="width:'+pct+'%"></i></div>';}
+  return '<div class="dev"><div class="dev-top"><span>PUT-AWAY · '+L.label.toUpperCase()+'</span><span>'+(r.i+1)+'/'+r.total+'</span></div>'+bar+main+'<div class="dev-hint">'+hint+'</div></div>'+msgHtml(r)+scene+
+    '<button class="btn ghost quit" data-action="quit">Quit run</button>';
+}
+
+function diff(a,b){return b.split('').map(function(c,i){return c===a[i]?c:'<mark>'+c+'</mark>';}).join('');}
+function renderLabel(r){
+  var c=r.cards[r.i],a=r.answered,it=c.item,left,right,why='';
+  if(c.kind==='loc'){
+    var shown=(a&&!c.match)?diff(it.loc,c.label):esc(c.label);
+    left='<h3>Handheld says</h3><div class="p-name">'+esc(it.name)+'</div><div class="small">'+packText(it.pack)+'</div><div class="p-code loc mono">'+it.loc+'</div>'+barcode(locDigits(it.loc),30);
+    right='<h3>Shelf label</h3><div class="p-name">Location</div><div class="small">Read the aisle, then each number</div><div class="p-code loc mono">'+shown+'</div>'+barcode(locDigits(c.label),30);
+    why=c.match?'Same location.':'Different location. Compare the aisle first, then each of the three numbers.';
+  }else{
+    var lab=c.label,shownC=(a&&!c.match)?diff(it.code,lab.code):esc(lab.code);
+    left='<h3>In your hand</h3><div class="p-name">'+esc(it.name)+'</div><div class="small">'+packText(it.pack)+'</div><div class="p-code mono">'+it.code+'</div>'+barcode(it.code,30);
+    right='<h3>Shelf label</h3><div class="p-name">'+esc(lab.name)+'</div><div class="small">'+packText(lab.pack)+'</div><div class="p-code mono">'+shownC+'</div>'+barcode(lab.code,30);
+    why=c.match?'Same product, same code.':(lab.name!==it.name?'That label belongs to a different product.':'Same name, but the code is different. Read every digit.');
+  }
+  var fb=a?'<div class="msg '+(a.right?'ok':'bad')+'" role="status">'+(a.right?'✓ Correct. ':'✕ Missed. ')+why+'</div>':'';
+  return '<h2>Label check</h2><div class="stat-line"><span>Card '+(r.i+1)+' of '+r.total+' · '+(c.kind==='loc'?'location':'product')+'</span><span>'+r.ok+' right · streak '+r.streak+'</span></div>'+
+  '<div class="pair"><div class="panel">'+left+'</div><div class="panel">'+right+'</div></div>'+fb+
+  (a?'<div class="answer-row"><button class="btn" data-action="next">'+(r.i+1>=r.total?'See results':'Next card')+'</button></div>'
+    :'<div class="answer-row"><button class="btn" data-action="answer" data-v="match">Match</button><button class="btn ghost" data-action="answer" data-v="diff">Different</button></div>')+
+  '<button class="btn ghost quit" data-action="quit">Quit</button>';
+}
+
+function renderAisle(r){
+  var it=r.its[r.i],a=r.answered;
+  var opts=r.opts.map(function(k){
+    var cls='';
+    if(a){if(CATOF[k]===CATOF[it.aisle])cls='right';else if(k===a.pick)cls='wrong';}
+    return '<button class="opt mono '+cls+'" data-action="answer" data-v="'+k+'"'+(a?' disabled':'')+'>'+k+'</button>';
+  }).join('');
+  var fb=a?'<div class="msg '+(a.right?'ok':'bad')+'" role="status">'+(a.right?'✓ Correct. ':'✕ Not quite. ')+esc(it.name)+' belongs with '+CATOF[it.aisle].label.toLowerCase()+': '+aisleList(CATOF[it.aisle])+'. This one is at '+it.loc+'.</div>':'';
+  return '<h2>Aisle recall</h2><div class="stat-line"><span>Item '+(r.i+1)+' of '+r.total+'</span><span>'+r.ok+' right</span></div>'+
+  '<div class="q"><div class="q-name">'+esc(it.name)+'</div><div class="small">'+packText(it.pack)+' · '+it.code+'</div></div><div class="opts">'+opts+'</div>'+fb+
+  (a?'<div class="answer-row"><button class="btn" data-action="next">'+(r.i+1>=r.total?'See results':'Next item')+'</button></div>':'')+
+  '<button class="btn ghost quit" data-action="quit">Quit</button>';
+}
+
+function renderType(r){
+  var it=r.its[r.i],a=r.answered;
+  var opts=CATS.map(function(c){
+    var cls='';
+    if(a){if(c.k===it.cat)cls='right';else if(c.k===a.pick)cls='wrong';}
+    return '<button class="opt txt '+cls+'" data-action="answer" data-v="'+c.k+'"'+(a?' disabled':'')+'>'+c.label+'</button>';
+  }).join('');
+  var fb=a?'<div class="msg '+(a.right?'ok':'bad')+'" role="status">'+(a.right?'✓ Correct. ':'✕ Not quite. ')+esc(it.name)+' goes in the '+CATBY[it.cat].label.toLowerCase()+' aisles. Its location is '+it.loc+'.</div>':'';
+  return '<h2>Aisle type</h2><div class="stat-line"><span>Item '+(r.i+1)+' of '+r.total+'</span><span>'+r.ok+' right</span></div>'+
+  '<div class="q"><div class="q-name">'+esc(it.name)+'</div><div class="small">'+packText(it.pack)+' · '+it.code+'</div></div><div class="opts">'+opts+'</div>'+fb+
+  (a?'<div class="answer-row"><button class="btn" data-action="next">'+(r.i+1>=r.total?'See results':'Next item')+'</button></div>':'')+
+  '<button class="btn ghost quit" data-action="quit">Quit</button>';
+}
+
+function renderRun(r){return r.kind==='putaway'?renderPutaway(r):r.kind==='label'?renderLabel(r):r.kind==='type'?renderType(r):renderAisle(r);}
+
+function renderResult(res){
+  var pct=Math.round(res.ok/res.total*100);
+  var msg=pct===100?'Clean run. Move up a level or go again at speed.':pct>=90?'Close. Read the slips below, then go again.':'Slow down and read every digit and letter. Repeat this level before moving up.';
+  var slips=res.errors.slice(0,12).map(function(e){return '<li>'+esc(e.text)+'</li>';}).join('');
+  return '<h2>'+KIND[res.kind]+' done</h2><div class="score mono">'+res.ok+'<small>/'+res.total+'</small></div>'+
+  '<p>'+UNIT[res.kind]+' · '+pct+'% · '+fmtTime(res.secs)+'</p><p class="lede" style="margin-top:8px">'+msg+'</p>'+
+  (slips?'<h3>Slips</h3><ul class="slips">'+slips+'</ul>':'<div style="height:14px"></div>')+
+  '<div class="btns"><button class="btn" data-action="start" data-v="'+res.kind+'">Go again</button><button class="btn ghost" data-action="home">Back to practice</button></div>';
+}
+
+function catList(){
+  var q=state.q.trim().toLowerCase();
+  return items().filter(function(i){
+    return (state.cat==='ALL'||i.cat===state.cat)&&(!q||i.name.toLowerCase().indexOf(q)>-1||i.code.indexOf(q)>-1||i.loc.toLowerCase().indexOf(q)>-1);
+  }).sort(function(a,b){return a.loc<b.loc?-1:a.loc>b.loc?1:0;});
+}
+function listHtml(){
+  var l=catList();
+  if(!l.length)return '<p class="small">Nothing matches. Check the spelling, or try the 6-digit code or a location such as BBD 01.</p>';
+  return '<ul class="rows">'+l.map(function(i){
+    return '<li class="row"><div class="row-main"><div class="row-name">'+esc(i.name)+(i.example?' <span class="tag">example</span>':'')+'</div><div class="small mono">'+packText(i.pack)+' · '+i.code+'</div></div>'+
+    '<div class="row-loc"><b class="mono">'+i.loc+'</b><span class="small">'+CATOF[i.aisle].short+'</span><button class="link" data-action="rm" data-code="'+i.code+'">Remove</button></div></li>';
+  }).join('')+'</ul><p class="small" style="margin-top:8px">'+l.length+' item'+(l.length===1?'':'s')+'</p>';
+}
+function renderCatalogue(){
+  var chips=[{k:'ALL',short:'All'}].concat(CATS).map(function(c){return '<button data-action="chip" data-v="'+c.k+'" aria-pressed="'+(state.cat===c.k)+'">'+c.short+'</button>';}).join('');
+  var opts=ALL.map(function(k){return '<option value="'+k+'">'+k+' · '+CATOF[k].short+'</option>';}).join('');
+  var hasEx=store.items.some(function(i){return i.example;});
+  return '<h2>Catalogue</h2><p class="lede">Look an item up by name, 6-digit code or location, then say where it lives before you check. Add your store\'s real items below, and remove the examples when you have enough of your own.</p>'+
+  '<div class="search"><input id="q" type="search" placeholder="Name, code or location" autocomplete="off" aria-label="Search the catalogue" value="'+esc(state.q)+'"></div>'+
+  '<div class="chips" role="group" aria-label="Aisle type filter">'+chips+'</div><div id="list">'+listHtml()+'</div>'+
+  (hasEx?'<p style="margin-top:10px"><button class="link" data-action="rmEx">Remove all example items</button></p>':'')+
+  '<details class="add"><summary>Add an item from your store</summary><form id="addf" class="f" novalidate>'+
+  '<label class="full">Product name<input id="f-name" type="text" maxlength="60" placeholder="e.g. Pozi Screwdriver PZ2"></label>'+
+  '<label class="half">6-digit product code<input id="f-code" type="text" inputmode="numeric" maxlength="6" placeholder="123456"></label>'+
+  '<label>Pack size<input id="f-pack" type="number" min="1" max="9999" value="1"></label>'+
+  '<label>Aisle<select id="f-aisle">'+opts+'</select></label>'+
+  '<label>Across<input id="f-x" type="number" min="1" max="99" placeholder="01"></label>'+
+  '<label>Level (height)<input id="f-h" type="number" min="1" max="99" placeholder="02"></label>'+
+  '<label>Along<input id="f-p" type="number" min="1" max="99" placeholder="05"></label>'+
+  '<div class="full"><button class="btn" type="submit">Add item</button><p id="fmsg" class="small" role="status" style="margin-top:8px"></p></div></form></details>';
+}
+
+function renderAisles(){
+  var all=items(),count={};
+  all.forEach(function(i){count[i.aisle]=(count[i.aisle]||0)+1;});
+  var cats=CATS.map(function(c){
+    return '<div class="cat"><div class="cat-h"><b>'+c.label+'</b><span class="small">'+c.aisles.length+' aisle'+(c.aisles.length===1?'':'s')+'</span></div><div class="codes mono">'+c.aisles.map(function(a){return '<span>'+a+(count[a]?' · '+count[a]:'')+'</span>';}).join('')+'</div></div>';
+  }).join('');
+  var targets='<option value="ALL">All aisles</option>'+CATS.map(function(c){return '<option value="C:'+c.k+'">All '+c.label.toLowerCase()+' aisles</option>';}).join('')+ALL.map(function(a){return '<option value="A:'+a+'">'+a+' only</option>';}).join('');
+  var rows=ALL.map(function(a){var d=dimsOf(a);return '<tr><td class="mono">'+a+'</td><td>'+CATOF[a].short+'</td><td class="mono">'+d.x+'</td><td class="mono">'+d.h+'</td><td class="mono">'+d.p+'</td></tr>';}).join('');
+  return '<h2>Aisles</h2>'+
+  '<section class="sec first"><h3>Reading a location</h3><div class="anat"><div class="slot" aria-hidden="true"><span class="slot-code mono">BBD 01-02-05</span>'+barcode(locDigits('BBD 01-02-05'),22)+'</div>'+
+  '<ul><li><b class="mono">BBD</b> is the aisle.</li><li><b class="mono">01</b> is across the aisle, 1 on one side up to 10 on the other.</li><li><b class="mono">02</b> is the level, how high up the shelving.</li><li><b class="mono">05</b> is how far along the aisle.</li></ul></div>'+
+  '<p class="small">Based on how a colleague described it. If any number works differently in your store, tell whoever set this up.</p></section>'+
+  '<section class="sec"><h3>What goes where</h3><p class="small">The number beside an aisle is how many catalogue items sit in it.</p>'+cats+'</section>'+
+  '<section class="sec"><h3>Aisle sizes</h3><p class="lede" style="margin-bottom:0">Aisles are not all the same height. Some have 15 levels, others 5 or 6. Set the real size so the drills only show shelves that exist. Until you do, every aisle assumes 10 across, 6 high and 20 along.</p>'+
+  '<form id="sizef" class="f" novalidate><label class="full">Apply to<select id="s-target">'+targets+'</select></label>'+
+  '<label>Across (max)<input id="s-x" type="number" min="1" max="99" value="10"></label><label>High (levels)<input id="s-h" type="number" min="1" max="99" value="6"></label><label>Along (max)<input id="s-p" type="number" min="1" max="99" value="20"></label>'+
+  '<div class="full"><button class="btn" type="submit">Apply sizes</button><p id="smsg" class="small" role="status" style="margin-top:8px"></p></div></form>'+
+  '<details class="add"><summary>All aisle sizes</summary><div class="tblwrap" style="margin-bottom:14px"><table class="tbl"><thead><tr><th>Aisle</th><th>Type</th><th>Across</th><th>High</th><th>Along</th></tr></thead><tbody>'+rows+'</tbody></table></div></details></section>'+
+  '<section class="sec"><h3>Habits that stop mis-shelving</h3><ol class="steps">'+
+  '<li>Scan the item first and let the handheld tell you where it goes.</li>'+
+  '<li>Read the size and pack on the item itself. Neighbouring sizes look almost identical.</li>'+
+  '<li>Walk to the location you were given. Never shelve by memory or by what is nearby.</li>'+
+  '<li>Read the aisle code, then all three numbers on the shelf label, before you scan it.</li>'+
+  '<li>If the shelf is full or the label does not match, stop and ask. Close enough is a lost item.</li>'+
+  '<li>Finish one tote before you start the next.</li></ol><p class="small">These are general good-practice steps. Where your store trains differently, follow your store.</p></section>';
+}
+
+function avg(kind){
+  var rs=store.runs.filter(function(r){return r.kind===kind;}).slice(-5);
+  if(!rs.length)return '–';
+  var ok=0,t=0;rs.forEach(function(r){ok+=r.ok;t+=r.total;});
+  return Math.round(ok/t*100)+'%';
+}
+function renderProgress(){
+  var runs=store.runs.slice(-12),chart;
+  if(!runs.length){chart='<p class="lede">No runs yet. Your last twelve appear here after your first drill.</p>';}
+  else{
+    chart='<div class="chart" role="img" aria-label="Accuracy of your last '+runs.length+' runs">'+runs.map(function(r){
+      var p=Math.round(r.ok/r.total*100);
+      return '<div class="col"><span class="v mono">'+p+'</span><span class="bw"><span class="bar'+(p>=95?' hit':'')+'" style="height:'+p+'%"></span></span><span class="k mono" title="'+KIND[r.kind]+'">'+KCH[r.kind]+'</span></div>';
+    }).join('')+'</div><p class="small" style="margin-top:6px">Each bar is one run and its height is your accuracy. The dashed line marks 95%, and a green bar reached it. P put-away · L label check · A aisle recall · T aisle type.</p>';
+  }
+  var all=items(),mm=Object.keys(store.missed).map(function(c){return {c:c,n:store.missed[c]};}).sort(function(a,b){return b.n-a.n;}).slice(0,5).map(function(o){
+    var it=all.filter(function(x){return x.code===o.c;})[0];return it?'<li><span>'+esc(it.name)+'<br><span class="small mono">'+it.code+' · '+it.loc+'</span></span><b class="mono">'+o.n+'×</b></li>':'';
+  }).join('');
+  var reset=state.confirm?'<div class="confirm"><span>Clear all runs and missed items?</span><button class="btn" data-action="resetYes">Yes, clear</button><button class="btn ghost" data-action="resetNo">Cancel</button></div>':'<button class="link" data-action="resetAsk">Reset progress</button>';
+  return '<h2>Progress</h2><p class="lede">Average accuracy over your last five runs of each drill.</p>'+
+  '<div class="avgs"><div><span class="small">Put-away</span><b class="mono">'+avg('putaway')+'</b></div><div><span class="small">Label check</span><b class="mono">'+avg('label')+'</b></div><div><span class="small">Aisle recall</span><b class="mono">'+avg('aisle')+'</b></div><div><span class="small">Aisle type</span><b class="mono">'+avg('type')+'</b></div></div>'+
+  chart+'<section class="sec" style="margin-top:18px"><h3>Most missed items</h3>'+(mm?'<ul class="missed">'+mm+'</ul>':'<p class="small">Nothing yet. Items you slip on show up here so you can go and look at them.</p>')+'</section>'+reset;
+}
+
+function render(){
+  document.querySelectorAll('.tabs button').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.v===state.tab));});
+  var h;
+  if(state.tab==='practice')h=state.run?renderRun(state.run):state.result?renderResult(state.result):renderHome();
+  else if(state.tab==='catalogue')h=renderCatalogue();
+  else if(state.tab==='aisles')h=renderAisles();
+  else h=renderProgress();
+  view.innerHTML=h;
+}
+
+/* ---------- put-away logic ---------- */
+function beginTask(r){
+  var it=r.items[r.i];
+  r.stage='item';r.curErr=0;r.lock=false;r.msg=null;
+  r.tote=shuffle([it].concat(lookalikes(it,r.pool,LEVELS[r.level].tote-1)));
+  startTimer(r);
+}
+function startTimer(r){
+  stopTimer();
+  if(!r.limit)return;
+  r.deadline=Date.now()+r.limit*1000;
+  timer=setInterval(function(){
+    var left=r.deadline-Date.now(),b=document.getElementById('tbar');
+    if(b)b.style.width=Math.max(0,left/(r.limit*1000)*100)+'%';
+    if(left<=0){stopTimer();timeout(r);}
+  },100);
+}
+function markErr(r,it,text){
+  if(!r.curErr)miss(it.code);
+  r.curErr++;r.errors.push({code:it.code,text:text});
+}
+function timeout(r){
+  if(state.run!==r||r.lock)return;
+  var it=r.items[r.i];
+  markErr(r,it,'Ran out of time on '+it.name);
+  r.lock=true;r.msg={t:'bad',x:'Out of time. Moving to the next item.'};
+  render();
+  setTimeout(function(){nextTask(r);},900);
+}
+function nextTask(r){
+  if(state.run!==r)return;
+  r.i++;
+  if(r.i>=r.total){finish(r);return;}
+  beginTask(r);render();
+}
+function scanItem(code){
+  var r=state.run;if(!r||r.kind!=='putaway'||r.lock)return;
+  var it=r.items[r.i];
+  if(code===it.code){r.stage='loc';r.msg={t:'ok',x:'Item matched. Now go to the location.'};}
+  else{
+    var got=r.pool.filter(function(p){return p.code===code;})[0];
+    markErr(r,it,'Scanned '+got.name+' ('+packText(got.pack)+') instead of '+it.name+' ('+packText(it.pack)+')');
+    r.msg={t:'bad',x:'Wrong item. That was '+got.name+', '+packText(got.pack)+'. Find '+it.name+'.'};
+  }
+  render();
+}
+function scanLoc(loc){
+  var r=state.run;if(!r||r.kind!=='putaway'||r.lock)return;
+  var it=r.items[r.i];
+  if(loc===it.loc){
+    stopTimer();r.lock=true;if(!r.curErr)r.ok++;
+    r.msg={t:'ok',x:'Put away at '+loc+'.'};render();
+    setTimeout(function(){nextTask(r);},700);
+  }else{
+    markErr(r,it,'Scanned label '+loc+' but '+it.name+' goes to '+it.loc);
+    r.msg={t:'bad',x:'Wrong shelf label. You scanned '+loc+'. Check the location on the screen and try again.'};
+    render();
+  }
+}
+
+/* ---------- label check logic ---------- */
+function bumpDigit(code,all){
+  for(var t=0;t<30;t++){
+    var i=1+Math.floor(Math.random()*5),d=code.split('');
+    d[i]=String((+d[i]+1+Math.floor(Math.random()*2))%10);
+    var c=d.join('');
+    if(c!==code&&!all.has(c))return c;
+  }
+  return code.slice(0,5)+String((+code[5]+1)%10);
+}
+function transposeCode(code,all){
+  var d=code.split(''),idx=[];
+  for(var i=0;i<5;i++)if(d[i]!==d[i+1])idx.push(i);
+  if(idx.length){
+    var k=idx[Math.floor(Math.random()*idx.length)],t=d[k];d[k]=d[k+1];d[k+1]=t;
+    var c=d.join('');
+    if(!all.has(c))return c;
+  }
+  return bumpDigit(code,all);
+}
+function mutateLoc(it){
+  var k=Math.floor(Math.random()*5),a=it.aisle,x=it.x,h=it.h,p=it.p;
+  function bump(v){return v>1&&Math.random()<0.5?v-1:v+1;}
+  if(k===0)p=bump(p);
+  else if(k===1)h=bump(h);
+  else if(k===2)x=bump(x);
+  else if(k===3){if(h!==p){var t=h;h=p;p=t;}else p=bump(p);}
+  else{var c=a.charCodeAt(2);a=a.slice(0,2)+String.fromCharCode(c>65&&Math.random()<0.5?c-1:c+1);}
+  var res=fmt(a,x,h,p);
+  return res===it.loc?fmt(a,x,h,p+1):res;
+}
+function makeCard(it,pool,codes){
+  if(Math.random()<0.5){
+    var match=Math.random()<0.5;
+    return {kind:'loc',item:it,label:match?it.loc:mutateLoc(it),match:match};
+  }
+  if(Math.random()<0.5)return {kind:'prod',item:it,label:{name:it.name,pack:it.pack,code:it.code},match:true};
+  var k=Math.random();
+  if(k<0.4){var nb=lookalikes(it,pool,1)[0];return {kind:'prod',item:it,label:{name:nb.name,pack:nb.pack,code:nb.code},match:false};}
+  return {kind:'prod',item:it,label:{name:it.name,pack:it.pack,code:k<0.75?transposeCode(it.code,codes):bumpDigit(it.code,codes)},match:false};
+}
+function aisleOpts(it){
+  /* Any aisle of the right type is acceptable, so the wrong options all come from other types.
+     Prefer ones sharing the first two letters, since those are the easy ones to mix up. */
+  var other=ALL.filter(function(a){return CATOF[a]!==CATOF[it.aisle];});
+  var near=other.filter(function(a){return a.slice(0,2)===it.aisle.slice(0,2);});
+  var far=other.filter(function(a){return a.slice(0,2)!==it.aisle.slice(0,2);});
+  return shuffle([it.aisle].concat(shuffle(near).concat(shuffle(far)).slice(0,3)));
+}
+function aisleList(c){return c.aisles.length<=5?c.aisles.join(', '):c.aisles.slice(0,3).join(', ')+' and '+(c.aisles.length-3)+' more';}
+
+/* ---------- run control ---------- */
+function startRun(kind){
+  var pool=items(),r;
+  state.result=null;state.tab='practice';state.homeMsg='';
+  if(pool.length<4){state.homeMsg='Add at least 4 items in Catalogue before you start a drill.';state.run=null;render();return;}
+  if(kind==='putaway'){
+    var its=shuffle(pool).slice(0,10);
+    r={kind:kind,level:state.level,pool:pool,items:its,total:its.length,i:0,ok:0,errors:[],t0:Date.now(),limit:LEVELS[state.level].limit};
+    state.run=r;beginTask(r);
+  }else if(kind==='label'){
+    var codes=new Set(pool.map(function(p){return p.code;}));
+    var its2=shuffle(pool).slice(0,20);
+    r={kind:kind,pool:pool,total:its2.length,cards:its2.map(function(it){return makeCard(it,pool,codes);}),i:0,ok:0,streak:0,answered:null,errors:[],t0:Date.now()};
+    state.run=r;
+  }else if(kind==='type'){
+    var itsT=shuffle(pool).slice(0,15);
+    r={kind:'type',pool:pool,its:itsT,total:itsT.length,i:0,ok:0,answered:null,errors:[],t0:Date.now()};
+    state.run=r;
+  }else{
+    var its3=shuffle(pool).slice(0,15);
+    r={kind:'aisle',pool:pool,its:its3,total:its3.length,i:0,ok:0,answered:null,errors:[],t0:Date.now(),opts:aisleOpts(its3[0])};
+    state.run=r;
+  }
+  window.scrollTo(0,0);render();
+}
+function answer(v){
+  var r=state.run;if(!r||r.answered)return;
+  if(r.kind==='label'){
+    var c=r.cards[r.i],said=(v==='match'),right=(said===c.match);
+    r.answered={said:said,right:right};
+    if(right){r.ok++;r.streak++;}
+    else{
+      r.streak=0;miss(c.item.code);
+      var what=c.kind==='loc'?c.label+' against '+c.item.loc:c.label.code+' against '+c.item.code;
+      r.errors.push({text:c.match?'Called a correct label different for '+c.item.name:'Missed a wrong label on '+c.item.name+': it read '+what});
+    }
+  }else if(r.kind==='type'){
+    var it2=r.its[r.i],ok2=(v===it2.cat);
+    r.answered={pick:v,right:ok2};
+    if(ok2)r.ok++;else{miss(it2.code);r.errors.push({text:it2.name+': you said '+CATBY[v].label.toLowerCase()+', it goes in '+CATBY[it2.cat].label.toLowerCase()+' ('+it2.aisle+')'});}
+  }else if(r.kind==='aisle'){
+    var it=r.its[r.i],ok=(CATOF[v]===CATOF[it.aisle]);
+    r.answered={pick:v,right:ok};
+    if(ok)r.ok++;else{miss(it.code);r.errors.push({text:it.name+': you said aisle '+v+'. '+CATOF[it.aisle].label+' go in '+aisleList(CATOF[it.aisle])+' (this one is at '+it.loc+')'});}
+  }
+  render();
+}
+function next(){
+  var r=state.run;if(!r||!r.answered)return;
+  r.i++;
+  if(r.i>=r.total){finish(r);return;}
+  r.answered=null;
+  if(r.kind==='aisle')r.opts=aisleOpts(r.its[r.i]);
+  render();
+}
+function finish(r){
+  stopTimer();
+  var secs=Math.round((Date.now()-r.t0)/1000);
+  var res={kind:r.kind,level:r.kind==='putaway'?r.level:null,ok:r.ok,total:r.total,secs:secs,t:Date.now(),errors:r.errors};
+  store.runs.push({t:res.t,kind:res.kind,level:res.level,ok:res.ok,total:res.total,secs:secs});
+  store.runs=store.runs.slice(-60);save();
+  state.run=null;state.result=res;window.scrollTo(0,0);render();
+}
+
+/* ---------- events ---------- */
+function refreshList(){var l=document.getElementById('list');if(l)l.innerHTML=listHtml();}
+function act(a,d){
+  switch(a){
+    case 'tab':stopTimer();state.tab=d.v;state.run=null;state.result=null;state.confirm=false;state.homeMsg='';window.scrollTo(0,0);render();break;
+    case 'level':state.level=d.v;render();break;
+    case 'start':startRun(d.v);break;
+    case 'quit':stopTimer();state.run=null;window.scrollTo(0,0);render();break;
+    case 'home':state.result=null;render();break;
+    case 'scanItem':scanItem(d.code);break;
+    case 'scanLoc':scanLoc(d.loc);break;
+    case 'answer':answer(d.v);break;
+    case 'next':next();break;
+    case 'chip':state.cat=d.v;render();break;
+    case 'rm':store.items=store.items.filter(function(c){return c.code!==d.code;});save();refreshList();break;
+    case 'rmEx':store.items=store.items.filter(function(c){return !c.example;});store.noEx=true;save();render();break;
+    case 'resetAsk':state.confirm=true;render();break;
+    case 'resetYes':store.runs=[];store.missed={};save();state.confirm=false;render();break;
+    case 'resetNo':state.confirm=false;render();break;
+  }
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-action]');
+  if(!b||b.disabled)return;
+  act(b.dataset.action,b.dataset);
+});
+document.addEventListener('input',function(e){
+  if(e.target.id==='q'){state.q=e.target.value;refreshList();}
+});
+function intIn(id){return parseInt(document.getElementById(id).value,10);}
+document.addEventListener('submit',function(e){
+  var f=e.target;
+  if(f.id==='addf'){
+    e.preventDefault();
+    var msg=document.getElementById('fmsg');
+    var say=function(t){msg.textContent=t;};
+    var name=document.getElementById('f-name').value.trim();
+    var code=document.getElementById('f-code').value.trim();
+    var pack=intIn('f-pack'),aisle=document.getElementById('f-aisle').value;
+    var x=intIn('f-x'),h=intIn('f-h'),p=intIn('f-p');
+    if(name.length<3)return say('Enter a product name of at least 3 characters.');
+    if(!/^\d{6}$/.test(code))return say('The product code must be exactly 6 digits.');
+    if(!(pack>=1&&pack<=9999))return say('Pack size must be a whole number from 1 to 9999.');
+    var d=dimsOf(aisle);
+    if(!(x>=1&&x<=d.x))return say('Across must be 1 to '+d.x+' in aisle '+aisle+'. Change the aisle size under Aisles if that is wrong.');
+    if(!(h>=1&&h<=d.h))return say('Level must be 1 to '+d.h+' in aisle '+aisle+'. Change the aisle size under Aisles if that is wrong.');
+    if(!(p>=1&&p<=d.p))return say('Along must be 1 to '+d.p+' in aisle '+aisle+'. Change the aisle size under Aisles if that is wrong.');
+    var loc=fmt(aisle,x,h,p),cur=items();
+    var dupC=cur.filter(function(i){return i.code===code;})[0],dupL=cur.filter(function(i){return i.loc===loc;})[0];
+    if(dupC)return say('Code '+code+' is already used by '+dupC.name+'.');
+    if(dupL)return say(loc+' already holds '+dupL.name+'. Pick another shelf.');
+    store.items.push({code:code,name:name,pack:pack,loc:loc});save();
+    f.reset();document.getElementById('f-pack').value=1;
+    say('Added '+name+' at '+loc+'. It now appears in the drills.');
+    refreshList();
+  }else if(f.id==='sizef'){
+    e.preventDefault();
+    var sm=document.getElementById('smsg');
+    var tgt=document.getElementById('s-target').value;
+    var nx=intIn('s-x'),nh=intIn('s-h'),np=intIn('s-p');
+    if(!(nx>=1&&nx<=99&&nh>=1&&nh<=99&&np>=1&&np<=99)){sm.textContent='Each size must be a whole number from 1 to 99.';return;}
+    var list=tgt==='ALL'?ALL:tgt.indexOf('C:')===0?CATBY[tgt.slice(2)].aisles:[tgt.slice(2)];
+    list.forEach(function(a){store.dims[a]={x:nx,h:nh,p:np};});
+    save();render();
+    var m2=document.getElementById('smsg');if(m2)m2.textContent='Saved. '+list.length+' aisle'+(list.length===1?'':'s')+' set to '+nx+' across, '+nh+' high, '+np+' along.';
+  }
+});
+
+render();
+})();
+</script>
+
+</body></html>
